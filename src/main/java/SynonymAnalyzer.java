@@ -31,7 +31,7 @@ public class SynonymAnalyzer extends Analyzer {
     }
 
     private SynonymMap buildSynonym() throws IOException {
-        InputStream stream = getClass().getResourceAsStream("/wordnet_wns.pl");
+        InputStream stream = getClass().getResourceAsStream("wordnet_wns.pl");
         Reader rulesReader = new InputStreamReader(stream);
         WordnetSynonymParser parser = new WordnetSynonymParser(true, true, new StandardAnalyzer(Version.LUCENE_4_9));
         try {

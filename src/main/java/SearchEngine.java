@@ -1,6 +1,5 @@
 import com.google.gson.Gson;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -27,20 +26,21 @@ public class SearchEngine {
     private IndexWriterConfig config;
     private SimpleFSDirectory index;
 
-    public SearchEngine(File indexDir) throws IOException {
-        this(indexDir, true);
+    public SearchEngine(File indexDir, String dataPath) throws IOException {
+        this(indexDir, dataPath, true);
     }
 
-    public SearchEngine(File indexDir, Boolean override) throws IOException {
+    public SearchEngine(File indexDir, String dataPath, Boolean override) throws IOException {
         this.analyzer = new SynonymAnalyzer();
         this.config = new IndexWriterConfig(Version.LUCENE_4_9, this.analyzer);
         if (override) {
             for (File f : indexDir.listFiles()) f.delete();
+            addToIndex(dataPath);
         }
         this.index = new SimpleFSDirectory(indexDir);
     }
 
-    public void createIndex(String dataPath) throws IOException {
+    public void addToIndex(String dataPath) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(
                 getClass().getResourceAsStream("/" + dataPath)));
         IndexWriter indexWriter = new IndexWriter(this.index, this.config);
@@ -57,7 +57,7 @@ public class SearchEngine {
     }
 
     public List<SearchRecord> processQuery(String searchQuery) throws ParseException, IOException {
-        return processQuery(searchQuery, 10);
+        return processQuery(searchQuery, 5);
     }
 
     public List<SearchRecord> processQuery(String searchQuery, int hitsCount) throws ParseException, IOException {
@@ -78,7 +78,7 @@ public class SearchEngine {
         System.out.println("Found " + hits.length + " hits.");
         for(int i=0; i<hits.length; ++i) {
             int docId = hits[i].doc;
-            SearchRecord item = new SearchRecord(searcher.doc(docId));
+            SearchRecord item = new SearchRecord(docId, searcher.doc(docId));
             result.add(item);
         }
         return result;
@@ -86,10 +86,11 @@ public class SearchEngine {
 
     private void addDoc(IndexWriter w, SearchRecord metadata) throws IOException {
         Document doc = new Document();
-        doc.add(new Field("author", metadata.author, Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("title", metadata.title, Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("price", metadata.price, Field.Store.YES, Field.Index.NO));
-        doc.add(new Field("link", metadata.link, Field.Store.YES, Field.Index.NO));
+        doc.add(new TextField("author", metadata.author, Field.Store.YES));
+        doc.add(new TextField("title", metadata.title, Field.Store.YES));
+        doc.add(new DoubleField("price", metadata.price, Field.Store.YES));
+        doc.add(new StringField("link", metadata.link, Field.Store.YES));
+        doc.add(new DoubleField("rating", metadata.rating, Field.Store.YES));
         w.addDocument(doc);
     }
 }
