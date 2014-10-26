@@ -1,6 +1,5 @@
 import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk;
-import weka.core.Instance;
 import weka.core.Instances;
 
 import java.io.File;

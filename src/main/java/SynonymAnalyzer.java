@@ -10,7 +10,10 @@ import org.apache.lucene.analysis.synonym.SynonymMap;
 import org.apache.lucene.analysis.synonym.WordnetSynonymParser;
 import org.apache.lucene.util.Version;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.text.ParseException;
 
 public class SynonymAnalyzer extends Analyzer {

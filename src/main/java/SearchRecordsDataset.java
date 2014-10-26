@@ -1,9 +1,9 @@
-import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-import java.util.*;
+
+import java.util.List;
 
 public class SearchRecordsDataset {
     private Instances dataset;

@@ -1,4 +1,4 @@
-import java.util.*;
+import java.util.List;
 
 public class NDCG {
     private static double Zk = 0.23;
