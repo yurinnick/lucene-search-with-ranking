@@ -1,7 +1,7 @@
 Lucene 4 Search + IBk Classifier Example
 =======================
 
-Example application with Apache Lucene search.
+Java application, which using (Apache Lucene)[http://lucene.apache.org], (WordNet)[http://wordnet.princeton.edu] and (WEKA)[http://www.cs.waikato.ac.nz/ml/weka/] to proof increasing search results relevance using post-ranking of requests with classifier (IBk Classifier).
 
 Execution steps:
 
@@ -12,5 +12,5 @@ Execution steps:
 - Run 5 queries with additional ranking with classifier and print them in order associated with rank from classifier.
 - Calculate NDCG for queries from previous step using manually added ranks.
 
-Because we use additional sorting on test queries NDCG have to increase (on real example it may not)
+Because of additional ranking on test queries, NDCG have to increase (on real example it may not)
 
