@@ -33,11 +33,9 @@ public class SearchEngine {
     public SearchEngine(File indexDir, String dataPath, Boolean override) throws IOException {
         this.analyzer = new SynonymAnalyzer();
         this.config = new IndexWriterConfig(Version.LUCENE_4_9, this.analyzer);
-        if (override) {
-            for (File f : indexDir.listFiles()) f.delete();
-            addToIndex(dataPath);
-        }
+        if (override) for (File f : indexDir.listFiles()) f.delete();
         this.index = new SimpleFSDirectory(indexDir);
+        if (override) addToIndex(dataPath);
     }
 
     public void addToIndex(String dataPath) throws IOException {
@@ -74,8 +72,6 @@ public class SearchEngine {
         TopScoreDocCollector collector = TopScoreDocCollector.create(hitsCount, true);
         searcher.search(query, collector);
         ScoreDoc[] hits = collector.topDocs().scoreDocs;
-        System.out.println(query);
-        System.out.println("Found " + hits.length + " hits.");
         for(int i=0; i<hits.length; ++i) {
             int docId = hits[i].doc;
             SearchRecord item = new SearchRecord(docId, searcher.doc(docId));

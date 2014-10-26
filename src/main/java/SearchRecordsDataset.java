@@ -1,15 +1,9 @@
+import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.converters.ArffSaver;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SearchRecordsDataset {
     private Instances dataset;
@@ -20,39 +14,39 @@ public class SearchRecordsDataset {
         searchRecordAttrs.addElement(new Attribute("rank"));
         searchRecordAttrs.addElement(new Attribute("price"));
         searchRecordAttrs.addElement(new Attribute("rating"));
-        searchRecordAttrs.addElement(new Attribute("titleOccurrence"));
-        searchRecordAttrs.addElement(new Attribute("authorOccurrence"));
+        searchRecordAttrs.addElement(new Attribute("occurrence"));
         dataset = new Instances("searchRecordAttrs", searchRecordAttrs, size);
         dataset.setClassIndex(0);
     }
 
-    public void appendSearchResults(List<String> query, List<SearchRecord> records, List<Integer> ranks) {
+    public void appendSearchResults(String query, List<SearchRecord> records, List<Integer> ranks) {
         for (int i=0; i < records.size(); i++) {
-            Instance processedRecord = processSearchRecord(query, records.get(i), ranks.get(i));
+            Instance processedRecord;
+            if (ranks == null) {
+                 processedRecord = processSearchRecord(query, records.get(i), null);
+            } else {
+                processedRecord = processSearchRecord(query, records.get(i), ranks.get(i));
+            }
             dataset.add(processedRecord);
         }
     }
 
-    public void save(File file) throws IOException {
-        ArffSaver saver = new ArffSaver();
-        saver.setInstances(dataset);
-        saver.setFile(file);
-        saver.writeBatch();
+    public void appendInstance(Instance instance) {
+        dataset.add(instance);
     }
 
-    public Instance processSearchRecord(List<String> query, SearchRecord record, Integer rank) {
-        Instance result = new Instance(5);
-        Integer searchWordsTitleCount = 0;
-        Integer searchWordsAuthorCount = 0;
-        for (String word: query) {
-            searchWordsTitleCount += countOccurrences(record.title.toLowerCase(), word.toLowerCase());
-            searchWordsAuthorCount += countOccurrences(record.author.toLowerCase(), word.toLowerCase());
+    public Instance processSearchRecord(String query, SearchRecord record, Integer rank) {
+        Instance result = new Instance(dataset.numAttributes());
+        Integer searchWordsCount = 0;
+        for (String word: query.split(" ")) {
+            searchWordsCount += countOccurrences(record.title.toLowerCase(), word.toLowerCase());
+            searchWordsCount += countOccurrences(record.author.toLowerCase(), word.toLowerCase());
         }
-        result.setValue((Attribute)searchRecordAttrs.elementAt(0), rank);
+        if (rank != null)
+            result.setValue((Attribute)searchRecordAttrs.elementAt(0), rank);
         result.setValue((Attribute)searchRecordAttrs.elementAt(1), record.price);
         result.setValue((Attribute)searchRecordAttrs.elementAt(2), record.rating);
-        result.setValue((Attribute)searchRecordAttrs.elementAt(3), (double)searchWordsTitleCount);
-        result.setValue((Attribute)searchRecordAttrs.elementAt(4), (double)searchWordsAuthorCount);
+        result.setValue((Attribute)searchRecordAttrs.elementAt(3), (double)searchWordsCount);
         return result;
     }
 

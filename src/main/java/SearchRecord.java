@@ -1,6 +1,6 @@
 import org.apache.lucene.document.Document;
 
-public class SearchRecord {
+public class SearchRecord implements Comparable<SearchRecord>{
     public String author;
     public String title;
     public Double price;
@@ -29,5 +29,12 @@ public class SearchRecord {
     @Override
     public String toString() {
         return String.format("%-5s \t $%-5s \t %-5s \t %-20s \t %s", id, price, rating, author, title);
+    }
+
+    @Override
+    public int compareTo(SearchRecord o) {
+        if (o.id == id) return 0;
+        if (o.id > id) return -1;
+        return 1;
     }
 }
